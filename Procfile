@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run app_deepspeech.py
+web: sh setup.sh && streamlit run webrtc.py
