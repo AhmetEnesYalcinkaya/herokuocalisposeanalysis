@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run webrtc.py
+web: streamlit run webrtc.py
