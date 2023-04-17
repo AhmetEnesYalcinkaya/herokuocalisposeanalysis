@@ -1,3 +1,3 @@
-# Pose Detection - Heroku
+# Pose Detection - Deployed From Heroku
 
 
