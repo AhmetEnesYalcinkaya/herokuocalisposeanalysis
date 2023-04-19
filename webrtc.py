@@ -31,7 +31,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 
-image = Image.open('image/ocalis.png')
+image = Image.open(r'image/ocalis.png')
 
 st.image(image)
 
