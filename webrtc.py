@@ -31,6 +31,10 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 
+image = Image.open('ocalis.png')
+
+st.image(image)
+
 #Mediapipe
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
