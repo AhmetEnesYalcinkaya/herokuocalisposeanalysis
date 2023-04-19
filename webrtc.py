@@ -114,45 +114,45 @@ if __name__ == "__main__":
             "stop": "Stop Analyze",})
     
 
-analysis = st.checkbox('📝 Show the analysis results')
+    analysis = st.checkbox('📝 Show the analysis results')
 
-if analysis:
-    option = st.selectbox('Choose sector name',('Automotive', 'Metal Production', 'Construction',"Plastic","Food"))
-    if option:
-        with st.spinner('⏳ Wait for analysis...'):
-            time.sleep(3)
-            st.success('💪 Analysis Completed!')
+    if analysis:
+        option = st.selectbox('Choose sector name',('Automotive', 'Metal Production', 'Construction',"Plastic","Food"))
+        if option:
+            with st.spinner('⏳ Wait for analysis...'):
+                time.sleep(3)
+                st.success('💪 Analysis Completed!')
 
-            ### 
-            labels = 'True', 'False'
-            sizes = [40,60]
+                ### 
+                labels = 'True', 'False'
+                sizes = [40,60]
 
-            fig1, ax1 = plt.subplots()
-            ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-                    shadow=True, startangle=90)
-            
-            col1, col2 = st.columns([1, 1])
+                fig1, ax1 = plt.subplots()
+                ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                        shadow=True, startangle=90)
+                
+                col1, col2 = st.columns([1, 1])
 
-            image = Image.open('image/pose.png')
-            col1.image(image)
-            col2.pyplot(fig1)
-            
-            ###
-            labels = 'True', 'False'
-            sizes = [40,60]
+                image = Image.open('image/pose.png')
+                col1.image(image)
+                col2.pyplot(fig1)
+                
+                ###
+                labels = 'True', 'False'
+                sizes = [40,60]
 
-            fig1, ax1 = plt.subplots()
-            ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-                    shadow=True, startangle=90)
-            
-            col1, col2 = st.columns([1, 1])
+                fig1, ax1 = plt.subplots()
+                ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                        shadow=True, startangle=90)
+                
+                col1, col2 = st.columns([1, 1])
 
-            image = Image.open('image/pose.png')
-            col1.image(image)
-            col2.pyplot(fig1)
-    
-            if st.button('📧 Send an e-mail as pdf'):
-                form('example.pdf')
+                image = Image.open('image/pose.png')
+                col1.image(image)
+                col2.pyplot(fig1)
+        
+                if st.button('📧 Send an e-mail as pdf'):
+                    form('example.pdf')
 
 
-    
+        
