@@ -157,7 +157,7 @@ if __name__ == "__main__":
                 
                 col1, col2 = st.columns([1, 1])
 
-                image = Image.open('image/pose.png')
+                image = Image.open(r'image/pose.png')
                 col1.image(image)
                 col2.pyplot(fig1)
         
