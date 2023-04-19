@@ -99,6 +99,20 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             st.markdown("Kameranin önüne geçiniz!")
             return av.VideoFrame.from_ndarray(image, format="bgr24")
 
+if __name__ == "__main__":
+    
+    webrtc_ctx = webrtc_streamer(   
+        key="deneme",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}], "sdpSemantics": "unified-plan"},
+        #rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}],"sdpSemantics": "unified-plan"},
+        video_frame_callback=video_frame_callback,
+        media_stream_constraints={"video": True},
+        async_processing=True,
+        translations={
+            "start": "👆 Start video recording",
+            "stop": "Stop Analyze",})
+    
 
 analysis = st.checkbox('📝 Show the analysis results')
 
@@ -140,18 +154,5 @@ if analysis:
             if st.button('📧 Send an e-mail as pdf'):
                 form('example.pdf')
 
-if __name__ == "__main__":
-    
-    webrtc_ctx = webrtc_streamer(   
-        key="deneme",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}], "sdpSemantics": "unified-plan"},
-        #rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}],"sdpSemantics": "unified-plan"},
-        video_frame_callback=video_frame_callback,
-        media_stream_constraints={"video": True},
-        async_processing=True,
-        translations={
-            "start": "👆 Start video recording",
-            "stop": "Stop Analyze",})
-    
+
     
