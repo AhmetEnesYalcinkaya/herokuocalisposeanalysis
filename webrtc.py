@@ -16,7 +16,6 @@ import math as m
 import matplotlib.pyplot as plt
 import asyncio
 
-
 #Streamlit
 st.set_page_config(
    page_title="Ocalis Pose Analysis App",
@@ -99,7 +98,6 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             #print("helooo")
             st.markdown("Kameranin önüne geçiniz!")
             return av.VideoFrame.from_ndarray(image, format="bgr24")
-
 
 
 analysis = st.checkbox('📝 Show the analysis results')
