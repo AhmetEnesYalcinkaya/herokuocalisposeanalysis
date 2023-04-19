@@ -100,7 +100,7 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             st.markdown("Kameranin önüne geçiniz!")
             return av.VideoFrame.from_ndarray(image, format="bgr24")
 
-
+##değişiklik
 if __name__ == "__main__":
     
     webrtc_ctx = webrtc_streamer(   
