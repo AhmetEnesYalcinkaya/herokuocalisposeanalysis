@@ -85,8 +85,10 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             #offset = findDistance(l_shoulder_x, l_shoulder_y, l_wrist_x, l_wrist_y)
             #print(offset)
 
-            cv2.circle(image, (l_wrist_x,l_wrist_y), 7, (255, 127, 0), -1)
-            cv2.circle(image, (l_shoulder_x,l_shoulder_y), 7, (0, 127, 0), -1)
+            if l_shoulder_y > l_wrist_y:
+                cv2.circle(image, (l_wrist_x,l_wrist_y), 20, (255, 0, 0), -1)
+            else:
+                cv2.circle(image, (l_shoulder_x,l_shoulder_y), 20, (0, 255, 0), -1)
             #cv2.circle(image, ( r_wrist_x, r_wrist_y), 7, (50, 50, 255), -1)
 
             #Mediapipe
