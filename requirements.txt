@@ -1,5 +1,5 @@
 opencv-python-headless
-streamlit == 1.10.0
+streamlit 
 mediapipe==0.8.9.1
 streamlit-webrtc==0.43.2
 pyarrow
