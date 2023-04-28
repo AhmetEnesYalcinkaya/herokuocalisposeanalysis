@@ -32,7 +32,7 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 image = Image.open(r'image/ocalis.png')
 st.image(image)
 
-tab1, tab2 = st.tabs(["📈 VIDEO", "📷 REAL-TIME"])
+#tab1, tab2 = st.tabs(["📈 VIDEO", "📷 REAL-TIME"])
 #Mediapipe
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -53,17 +53,17 @@ def main():
         player_factory=create_player,
         video_frame_callback=video_frame_callback,)
     """
-    with tab1:
-        webrtc_ctx = webrtc_streamer(   
-            key="deneme",
-            mode=WebRtcMode.SENDRECV,
-            rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}], "sdpSemantics": "unified-plan"},
-            video_frame_callback=video_frame_callback,
-            media_stream_constraints={"video": True},
-            async_processing=True,
-            translations={
-                "start": "👆 Start video recording",
-                "stop": "Stop Analyze",})
+    
+    webrtc_ctx = webrtc_streamer(   
+        key="deneme",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}], "sdpSemantics": "unified-plan"},
+        video_frame_callback=video_frame_callback,
+        media_stream_constraints={"video": True},
+        async_processing=True,
+        translations={
+            "start": "👆 Start video recording",
+            "stop": "Stop Analyze",})
     #st.write("---")
 
     with st.expander("See Analysis Section"):
