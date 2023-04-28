@@ -41,6 +41,7 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=2)
 
 
 def main():
+    """
     with tab1:
         webrtc_streamer(
         key="deneme1",
@@ -51,7 +52,8 @@ def main():
         },
         player_factory=create_player,
         video_frame_callback=video_frame_callback,)
-    with tab2:
+    """
+    with tab1:
         webrtc_ctx = webrtc_streamer(   
             key="deneme",
             mode=WebRtcMode.SENDRECV,
