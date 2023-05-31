@@ -40,25 +40,35 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=2)
+global flag, start_time, total_time, red_time,time_ratio
 
 flag = False
+start_time = 0
+red_time = 0
+total_time = 0
+time_ratio = 0
+
 # Calculate distance
 def findDistance(x1, y1, x2, y2):
     dist = m.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
     return dist
 
 def calculate(l_shoulder_y , l_wrist_y):
-    print(l_shoulder_y,l_wrist_y)
+    #print(l_shoulder_y,l_wrist_y)
+    global red_time, total_time,time_ratio
+    # Calculate the time spent in red zone
     if l_shoulder_y > l_wrist_y:
-        start_time = time.time()
-        #print(start_time)
-
-
+        red_time += 1
+    total_time += 1
+    
 def form(path):
     pass
 
 def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
+    
+    #time_ratio = None
     image = frame.to_ndarray(format="bgr24")
+    
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         try:
             image.flags.writeable = False
@@ -82,12 +92,15 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             r_wrist_y = int(lm.landmark[lmPose.RIGHT_WRIST].y * h)
 
             calculate(l_shoulder_y , l_wrist_y)
-            #offset = findDistance(l_shoulder_x, l_shoulder_y, l_wrist_x, l_wrist_y)
-            #print(offset)
 
+            time_ratio = red_time / total_time   
+            print(time_ratio)
+
+            #Drawing
             if l_shoulder_y > l_wrist_y:
                 cv2.circle(image, (l_wrist_x,l_wrist_y), 20, (0, 0, 255), -1) #red
                 cv2.circle(image, (l_shoulder_x,l_shoulder_y), 20, (0, 0, 255), -1) # red
+                    
             elif l_shoulder_y == l_wrist_y:
                 cv2.circle(image, (l_wrist_x,l_wrist_y), 20, (255, 255, 0), -1) #yellow
                 cv2.circle(image, (l_shoulder_x,l_shoulder_y), 20, (255, 255, 0), -1) #yellow
@@ -101,16 +114,15 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
                 results.pose_landmarks,
                 mp_pose.POSE_CONNECTIONS,
                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            
+
             return av.VideoFrame.from_ndarray(image, format="bgr24")
-            
+        
         except:
             #print("helooo")
             st.markdown("Kameranin önüne geçiniz!")
             return av.VideoFrame.from_ndarray(image, format="bgr24")
 
 if __name__ == "__main__":
-    
     webrtc_ctx = webrtc_streamer(   
         key="deneme",
         mode=WebRtcMode.SENDRECV,
@@ -123,46 +135,43 @@ if __name__ == "__main__":
             "start": "👆 Start video recording",
             "stop": "Stop Analyze",})
     
+    if webrtc_ctx.state.playing == False:
+        analysis = st.checkbox('📝 Show the analysis results')
+        if analysis:
+            option = st.selectbox('Choose sector name',('Automotive', 'Metal Production', 'Construction',"Plastic","Food"))
+            if option:
+                with st.spinner('⏳ Wait for analysis...'):
+                    time.sleep(3)
+                    st.success('💪 Analysis Completed!')
+                    ### graph 1
+                    labels = 'True', 'False'
+                    sizes = [(1- time_ratio),time_ratio]
 
-    analysis = st.checkbox('📝 Show the analysis results')
+                    fig1, ax1 = plt.subplots()
+                    ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                            shadow=True, startangle=90)
+                    
+                    col1, col2 = st.columns([1, 1])
 
-    if analysis:
-        option = st.selectbox('Choose sector name',('Automotive', 'Metal Production', 'Construction',"Plastic","Food"))
-        if option:
-            with st.spinner('⏳ Wait for analysis...'):
-                time.sleep(3)
-                st.success('💪 Analysis Completed!')
-
-                ### 
-                labels = 'True', 'False'
-                sizes = [40,60]
-
-                fig1, ax1 = plt.subplots()
-                ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-                        shadow=True, startangle=90)
-                
-                col1, col2 = st.columns([1, 1])
-
-                image = Image.open('image/pose.png')
-                col1.image(image)
-                col2.pyplot(fig1)
-                
-                ###
-                labels = 'True', 'False'
-                sizes = [40,60]
-
-                fig1, ax1 = plt.subplots()
-                ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-                        shadow=True, startangle=90)
-                
-                col1, col2 = st.columns([1, 1])
-
-                image = Image.open(r'image/pose.png')
-                col1.image(image)
-                col2.pyplot(fig1)
-        
-                if st.button('📧 Send an e-mail as pdf'):
-                    form('example.pdf')
+                    image = Image.open('image/pose.png')
+                    col1.image(image)
+                    col2.pyplot(fig1)
+                    
+                    ### graph 2
+                    labels = 'True', 'False'
+                    sizes = [(1- time_ratio),time_ratio]
 
 
-        
+                    fig1, ax1 = plt.subplots()
+                    ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                            shadow=True, startangle=90)
+                    
+                    col1, col2 = st.columns([1, 1])
+
+                    image = Image.open(r'image/pose.png')
+                    col1.image(image)
+                    col2.pyplot(fig1)
+            
+                    if st.button('📧 Send an e-mail as pdf'):
+                        form('example.pdf')
+    

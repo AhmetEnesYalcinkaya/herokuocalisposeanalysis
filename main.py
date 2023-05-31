@@ -1,4 +1,5 @@
 from pathlib import Path
+import consts
 import cv2
 import numpy as np
 import streamlit as st
@@ -39,21 +40,7 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=2)
 
-
 def main():
-    """
-    with tab1:
-        webrtc_streamer(
-        key="deneme1",
-        mode=WebRtcMode.RECVONLY,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}], "sdpSemantics": "unified-plan"},
-        media_stream_constraints={
-            "video": True,
-        },
-        player_factory=create_player,
-        video_frame_callback=video_frame_callback,)
-    """
-    
     webrtc_ctx = webrtc_streamer(   
         key="deneme",
         mode=WebRtcMode.SENDRECV,
@@ -64,38 +51,60 @@ def main():
         translations={
             "start": "👆 Start video recording",
             "stop": "Stop Analyze",})
-    #st.write("---")
-
+    
+    #if webrtc_ctx.state.playing == False:
     with st.expander("See Analysis Section"):
         
         option = st.selectbox('Choose the sector name',('Automotive', 'Metal Production', 'Construction',"Plastic","Food"))
         analysis = st.button('📝 Show the analysis results')
 
-        if analysis:
+        if analysis and len(consts.sizes) > 0:
             with st.spinner('⏳ Wait for analysis...'):
                 time.sleep(1)
                 st.success('💪 Analysis Completed!')
 
-                ### 
-                labels = 'True', 'False'
-                sizes = [40,60]
+                # Graph 1 
+                print("sizes   : ", consts.sizes, type(consts.sizes))
+                labels = 'Wrong Position', 'Normal Position'
+                value = [consts.sizes[0],consts.sizes[1]]
+                
 
                 fig1, ax1 = plt.subplots()
-                ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                ax1.pie(value, labels=labels, autopct='%1.1f%%',
                         shadow=True, startangle=90)
                 
-                col1, col2 = st.columns([1, 1])
+                col1, col2 = st.columns([1,2])
 
                 image = Image.open('image/pose.png')
                 col1.image(image)
                 col2.pyplot(fig1)
-        
-                if st.button('📧 Send an e-mail as pdf'):
-                    form('example.pdf')
+                fig1.savefig('graph1.pdf')
+
+                # Graph 2
+                print("sizes   : ", consts.sizes, type(consts.sizes))
+                labels = 'Wrong Position', 'Normal Position'
+                value = [consts.sizes[0],consts.sizes[1]]
+                
+
+                fig1, ax1 = plt.subplots()
+                ax1.pie(value, labels=labels, autopct='%1.1f%%',
+                        shadow=True, startangle=90)
+                
+                col1, col2 = st.columns([1,2])
+
+                image = Image.open('image/pose.png')
+                col1.image(image)
+                col2.pyplot(fig1)
+                
+                
+                with open("graph1.pdf", "rb") as file:
+                    btn = st.download_button(
+                            label="Download image",
+                            data=file,
+                            file_name="graph.png",
+                            mime="image/png")
 
 
-def create_player():
-    return MediaPlayer(str("image/video.mp4"))
 
 #flag = False
 # Calculate distance
@@ -104,15 +113,29 @@ def findDistance(x1, y1, x2, y2):
     return dist
 
 def calculate(l_shoulder_y , l_wrist_y):
-    print(l_shoulder_y,l_wrist_y)
+    #print(l_shoulder_y,l_wrist_y)
     if l_shoulder_y > l_wrist_y:
-        start_time = time.time()
-        #print(start_time)
+        pass
 
 def form(path):
-    pass
+    # Create a new PDF document
+    pdf = PyPDF2.PdfFileWriter()
 
+    # Add some text to the document
+    pdf.addPage(PyPDF2.PdfPageObject.createFromString('This is some text.'))
+    print("I m here")
+    # Save the document
+    pdf.write(path)
+
+total_time = 0
+red_circle_time = 0
 def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
+    global total_time, red_circle_time,ratio
+    # Calculate the elapsed time for each frame
+    frame_time = frame.time
+    # Increment the total video time
+    total_time += frame_time
+
     image = frame.to_ndarray(format="bgr24")
     with mp_pose.Pose(min_detection_confidence=0.2, min_tracking_confidence=0.2) as pose:
         try:
@@ -139,6 +162,11 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             calculate(l_shoulder_y , l_wrist_y)
             #offset = findDistance(l_shoulder_x, l_shoulder_y, l_wrist_x, l_wrist_y)
             #print(offset)
+            if l_shoulder_y > l_wrist_y:
+                red_circle_time += frame_time
+            ratio = red_circle_time / total_time
+            consts.sizes = [ratio * 100, (100 - ratio * 100)]
+            print(consts.sizes,type(consts.sizes))
 
             if l_shoulder_y > l_wrist_y:
                 cv2.circle(image, (l_wrist_x,l_wrist_y), 15, (0, 0, 255), -1) #red
@@ -149,6 +177,7 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
             else:
                 cv2.circle(image, (l_wrist_x,l_wrist_y), 15, (0, 255, 0), -1) #green
                 cv2.circle(image, (l_shoulder_x,l_shoulder_y), 15, (0, 255, 0), -1) #green
+
             #Mediapipe
             mp_drawing.draw_landmarks(
                 image,
